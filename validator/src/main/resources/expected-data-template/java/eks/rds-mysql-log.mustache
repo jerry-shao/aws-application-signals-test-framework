@@ -11,8 +11,8 @@
   "Service": "^{{serviceName}}$",
   "Operation": "GET /mysql",
   "Version": "^1$",
-  "Telemetry.Source": "^LocalRootSpan$",
-  "Host": "^ip(-[0-9]{1,3}){4}.*$"
+  "Host": "^ip(-[0-9]{1,3}){4}.*$",
+  "Telemetry.Source": "^LocalRootSpan$"
 },
 {
   "EC2.AutoScalingGroup": "^eks-.+",
@@ -27,6 +27,6 @@
   "Service": "^{{serviceName}}$",
   "Operation": "GET /mysql",
   "Version": "^1$",
-  "Telemetry.Source": "^ClientSpan$",
-  "Host": "^ip(-[0-9]{1,3}){4}.*$"
+  "Host": "^ip(-[0-9]{1,3}){4}.*$",
+  "RemoteOperation": "^SELECT$"
 }]
