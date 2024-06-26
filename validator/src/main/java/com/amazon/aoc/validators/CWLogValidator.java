@@ -147,7 +147,7 @@ public class CWLogValidator implements IValidator {
     }
 
     if (remoteResourceType != null && remoteResourceIdentifier != null) {
-      dependencyFilter += "($.RemoteResourceType = \"%s\") && ($.RemoteResourceIdentifier = \"%s\")".formatted(remoteResourceType, remoteResourceIdentifier);
+      dependencyFilter += String.format("($.RemoteResourceType = \"%s\") && ($.RemoteResourceIdentifier = \"%s\")", remoteResourceType, remoteResourceIdentifier);
     }
 
     String filterPattern = String.format("{ ($.Service = %s) && ($.Operation = \"%s\") %s }", context.getServiceName(), operation, dependencyFilter);
