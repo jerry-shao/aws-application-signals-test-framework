@@ -114,11 +114,15 @@ resource "kubernetes_deployment" "python_app_deployment" {
               #inject the test id to service name for unique App Signals metrics
               name = "OTEL_SERVICE_NAME"
               value = "python-application-${var.test_id}"
-            }
+          }
           env {
               name = "DJANGO_SETTINGS_MODULE"
               value = "django_frontend_service.settings"
-            }
+          }
+          env {
+              name = "MY_TEST_VAR"
+              value = var.my_test_var
+          }
           
           port {
             container_port = 8000
