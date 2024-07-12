@@ -3,6 +3,7 @@
 import logging
 import threading
 import time
+import os
 
 import boto3
 import requests
@@ -44,6 +45,7 @@ def run_local_root_client_call_recurring_service():
 run_local_root_client_call_recurring_service()
 
 def healthcheck(request):
+    logger.info(os.environ)
     return HttpResponse("healthcheck")
 
 def aws_sdk_call(request):
