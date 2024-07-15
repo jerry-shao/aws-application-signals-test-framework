@@ -121,7 +121,8 @@ resource "kubernetes_deployment" "sample_app_deployment" {
           }
           env {
             name = "RDS_MYSQL_CLUSTER_PASSWORD"
-            value = var.rds_mysql_cluster_password
+            value = ">6TjH%v0qnW)9M|Qe0$$(<9viA$E"
+#             value = var.rds_mysql_cluster_password
           }
           port {
             container_port = 8080
