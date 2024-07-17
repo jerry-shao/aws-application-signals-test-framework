@@ -129,11 +129,13 @@ resource "kubernetes_deployment" "python_app_deployment" {
           }
           env {
             name = "RDS_MYSQL_CLUSTER_USERNAME"
-            value = var.rds_mysql_cluster_username
+            value = "admin"
+#             value = var.rds_mysql_cluster_username
           }
           env {
             name = "RDS_MYSQL_CLUSTER_PASSWORD"
-            value = var.rds_mysql_cluster_password
+            value = "5(Je!E)B{FW}$Q(xT+w$7kwG+dwW"
+#             value = var.rds_mysql_cluster_password
           }
           
           port {
