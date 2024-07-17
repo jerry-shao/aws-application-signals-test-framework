@@ -78,10 +78,14 @@ def http_call(request):
     return get_xray_trace_id()
 
 def mysql(request):
-    logger.info(f"Endpoint: {os.environ["RDS_MYSQL_CLUSTER_ENDPOINT"]}")
-    logger.info(f"Username: {os.environ["RDS_MYSQL_CLUSTER_USERNAME"]}")
-    logger.info(f"Password: {os.environ["RDS_MYSQL_CLUSTER_PASSWORD"]}")
-    logger.info(f"Database: {os.environ["RDS_MYSQL_CLUSTER_DATABASE"]}")
+    endpoint = os.environ["RDS_MYSQL_CLUSTER_ENDPOINT"]
+    username = os.environ["RDS_MYSQL_CLUSTER_USERNAME"]
+    password = os.environ["RDS_MYSQL_CLUSTER_PASSWORD"]
+    database = os.environ["RDS_MYSQL_CLUSTER_DATABASE"]
+    logger.info(f"Endpoint: {endpoint}")
+    logger.info(f"Username: {username}")
+    logger.info(f"Password: {password}")
+    logger.info(f"Database: {database}")
     return get_xray_trace_id()
 
 def downstream_service(request):
