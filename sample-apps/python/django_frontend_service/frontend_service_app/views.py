@@ -6,6 +6,7 @@ import time
 import os
 
 import boto3
+import pymysql
 import requests
 import schedule
 from django.http import HttpResponse, JsonResponse
@@ -82,10 +83,23 @@ def mysql(request):
     username = os.environ["RDS_MYSQL_CLUSTER_USERNAME"]
     password = os.environ["RDS_MYSQL_CLUSTER_PASSWORD"]
     database = os.environ["RDS_MYSQL_CLUSTER_DATABASE"]
-    logger.info(f"Endpoint: {endpoint}")
-    logger.info(f"Username: {username}")
-    logger.info(f"Password: {password}")
-    logger.info(f"Database: {database}")
+
+    # Connect to the database
+    connection = pymysql.connect(
+        host=endpoint,
+        user=username,
+        password=password,
+        database=database,
+        cursorclass=pymysql.cursors.DictCursor)
+
+    with connection:
+        with connection.cursor() as cursor:
+            # Read a single record
+            sql = "SELECT * FROM tables LIMIT 1"
+            cursor.execute(sql)
+            result = cursor.fetchone()
+            logger.info(result)
+
     return JsonResponse({
         'endpoint': endpoint,
         'username': username,
