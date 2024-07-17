@@ -86,12 +86,12 @@ def mysql(request):
     logger.info(f"Username: {username}")
     logger.info(f"Password: {password}")
     logger.info(f"Database: {database}")
-    return {
+    return JsonResponse({
         'endpoint': endpoint,
         'username': username,
         'password': password,
         'database': database
-    }
+    })
 
 def downstream_service(request):
     ip = request.GET.get('ip', '')
