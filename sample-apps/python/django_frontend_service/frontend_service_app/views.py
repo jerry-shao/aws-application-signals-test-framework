@@ -77,6 +77,13 @@ def http_call(request):
         logger.error("Could not complete http request:" + str(e))
     return get_xray_trace_id()
 
+def mysql(request):
+    logger.info(f"Endpoint: {os.environ["RDS_MYSQL_CLUSTER_ENDPOINT"]}")
+    logger.info(f"Username: {os.environ["RDS_MYSQL_CLUSTER_USERNAME"]}")
+    logger.info(f"Password: {os.environ["RDS_MYSQL_CLUSTER_PASSWORD"]}")
+    logger.info(f"Database: {os.environ["RDS_MYSQL_CLUSTER_DATABASE"]}")
+    return get_xray_trace_id()
+
 def downstream_service(request):
     ip = request.GET.get('ip', '')
     ip = ip.replace("/", "")
