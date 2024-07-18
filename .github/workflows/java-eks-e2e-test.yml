@@ -176,12 +176,11 @@ jobs:
           echo ${{ github.workspace }}
           echo ${{ env.CLUSTER_NAME }}
           echo ${{ env.SAMPLE_APP_NAMESPACE }}
-          echo ${{ env.TESTING_ID }}
           echo ${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}
           echo ${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}
           echo ${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}
           echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}
-          echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}  | sed 's/./& /g'
+          echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}  | sed 's/ //g'
           # Attempt to deploy the sample app on an EKS instance and wait for its endpoint to come online. 
           # There may be occasional failures due to transitivity issues, so try up to 2 times. 
           # deployment_failed of 0 indicates that both the terraform deployment and the endpoint are running, while 1 indicates
