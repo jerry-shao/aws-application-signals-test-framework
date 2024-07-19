@@ -171,8 +171,6 @@ jobs:
         id: deploy-sample-app
         working-directory: terraform/java/eks
         run: |
-          echo ${{ env.TESTING_ID }}
-          echo ${{ env.E2E_TEST_AWS_REGION }}
           echo ${{ github.workspace }}
           echo ${{ env.CLUSTER_NAME }}
           echo ${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}
@@ -190,17 +188,17 @@ jobs:
             deployment_failed=0
             terraform apply -auto-approve \
               -var="test_id=${{ env.TESTING_ID }}" \
-              -var="aws_region=us-east-1" \
+              -var="aws_region=${{ env.E2E_TEST_AWS_REGION }}" \
               -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
               -var="eks_cluster_name=e2e-canary-test" \
               -var="eks_cluster_context_name=$(kubectl config current-context)" \
               -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
               -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
-              -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
+              -var="sample_app_image=328959602803.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/appsignals-java-springboot-main-service" \
               -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service" \
               -var="rds_mysql_cluster_endpoint=rdsaurorajavaclusterformysql.cluster-c3u7zyraw3mi.us-east-1.rds.amazonaws.com" \
               -var="rds_mysql_cluster_username=admin" \
-              -var="rds_mysql_cluster_password=123456" \
+              -var="rds_mysql_cluster_password=QSLcl${]%wjN7]lq9Nb[)gMTbc.N" \
             || deployment_failed=$?
           
             if [ $deployment_failed -ne 0 ]; then
@@ -214,11 +212,11 @@ jobs:
               execute_and_retry 3 \
               "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/enable-app-signals.sh \
               e2e-canary-test \
-              us-east-1 \
+              ${{ env.E2E_TEST_AWS_REGION }} \
               ${{ env.SAMPLE_APP_NAMESPACE }}" \
               "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
               e2e-canary-test \
-              us-east-1 \
+              ${{ env.E2E_TEST_AWS_REGION }} \
               ${{ env.SAMPLE_APP_NAMESPACE }} && \
               aws eks update-kubeconfig --name e2e-canary-test --region us-east-1" \
               60
@@ -266,7 +264,7 @@ jobs:
               echo "Cleaning up App Signal"
               /__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
               e2e-canary-test \
-              us-east-1 \
+              ${{ env.E2E_TEST_AWS_REGION }} \
               ${{ env.SAMPLE_APP_NAMESPACE }}
           
               # Running clean-app-signal.sh removes the current cluster from the config. Update the cluster again for subsequent runs.
@@ -275,12 +273,12 @@ jobs:
               echo "Destroying terraform"
               terraform destroy -auto-approve \
                 -var="test_id=${{ env.TESTING_ID }}" \
-                -var="aws_region=us-east-1" \
+                -var="aws_region=${{ env.E2E_TEST_AWS_REGION }}" \
                 -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
                 -var="eks_cluster_name=e2e-canary-test" \
                 -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
                 -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
-                -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
+                -var="sample_app_image=328959602803.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/appsignals-java-springboot-main-service" \
                 -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service"
           
               retry_counter=$(($retry_counter+1))
