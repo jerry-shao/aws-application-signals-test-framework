@@ -179,8 +179,6 @@ jobs:
           echo ${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}
           echo ${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}
           echo ${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}
-          echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}
-          echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}
           echo $(cat /__w/_temp/*.sh)
           # Attempt to deploy the sample app on an EKS instance and wait for its endpoint to come online. 
           # There may be occasional failures due to transitivity issues, so try up to 2 times. 
