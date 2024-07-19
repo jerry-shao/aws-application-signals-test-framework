@@ -181,6 +181,7 @@ jobs:
           echo ${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}
           echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}
           echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}  | sed 's/ //g'
+          echo ${{ env.TEST_RESOURCES_FOLDER }}
           # Attempt to deploy the sample app on an EKS instance and wait for its endpoint to come online. 
           # There may be occasional failures due to transitivity issues, so try up to 2 times. 
           # deployment_failed of 0 indicates that both the terraform deployment and the endpoint are running, while 1 indicates
@@ -191,18 +192,18 @@ jobs:
             echo "Attempt $retry_counter"
             deployment_failed=0
             terraform apply -auto-approve \
-              -var="test_id=${{ env.TESTING_ID }}" \
-              -var="aws_region=${{ env.E2E_TEST_AWS_REGION }}" \
-              -var="kube_directory_path=${{ github.workspace }}/.kube" \
-              -var="eks_cluster_name=${{ env.CLUSTER_NAME }}" \
+              -var="test_id=java-eks-10004236436-22-1" \
+              -var="aws_region=us-east-1" \
+              -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
+              -var="eks_cluster_name=e2e-canary-test" \
               -var="eks_cluster_context_name=$(kubectl config current-context)" \
-              -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
-              -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
-              -var="sample_app_image=${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}" \
-              -var="sample_remote_app_image=${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}" \
-              -var="rds_mysql_cluster_endpoint=${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}" \
-              -var="rds_mysql_cluster_username=${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}" \
-              -var="rds_mysql_cluster_password=${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}" \
+              -var="test_namespace=ns-10004236436-22" \
+              -var="service_account_aws_access=service-account-java-eks-10004236436-22-1" \
+              -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
+              -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service" \
+              -var="rds_mysql_cluster_endpoint=example.com" \
+              -var="rds_mysql_cluster_username=admin" \
+              -var="rds_mysql_cluster_password=123456" \
             || deployment_failed=$?
           
             if [ $deployment_failed -ne 0 ]; then
@@ -215,18 +216,18 @@ jobs:
               . ${{ env.TEST_RESOURCES_FOLDER }}/.github/workflows/util/execute_and_retry.sh
               execute_and_retry 3 \
               "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/enable-app-signals.sh \
-              ${{ env.CLUSTER_NAME }} \
-              ${{ env.E2E_TEST_AWS_REGION }} \
-              ${{ env.SAMPLE_APP_NAMESPACE }}" \
+              e2e-canary-test \
+              us-east-1 \
+              ns-10004236436-22" \
               "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
-              ${{ env.CLUSTER_NAME }} \
-              ${{ env.E2E_TEST_AWS_REGION }} \
-              ${{ env.SAMPLE_APP_NAMESPACE }} && \
-              aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.E2E_TEST_AWS_REGION }}" \
+              e2e-canary-test \
+              us-east-1 \
+              ns-10004236436-22 && \
+              aws eks update-kubeconfig --name e2e-canary-test --region us-east-1" \
               60
           
-              execute_and_retry 2 "kubectl delete pods --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 60
-              execute_and_retry 2 "kubectl wait --for=condition=Ready --request-timeout '5m' pod --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 10
+              execute_and_retry 2 "kubectl delete pods --all -n ns-10004236436-22" "" 60
+              execute_and_retry 2 "kubectl wait --for=condition=Ready --request-timeout '5m' pod --all -n ns-10004236436-22" "" 10
           
               echo "Attempting to connect to the main sample app endpoint"
               main_sample_app_endpoint=http://$(terraform output sample_app_endpoint)
@@ -267,23 +268,23 @@ jobs:
             if [ $deployment_failed -eq 1 ]; then
               echo "Cleaning up App Signal"
               ${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
-              ${{ env.CLUSTER_NAME }} \
-              ${{ env.E2E_TEST_AWS_REGION }} \
-              ${{ env.SAMPLE_APP_NAMESPACE }}
+              e2e-canary-test \
+              us-east-1 \
+              ns-10004236436-22
           
               # Running clean-app-signal.sh removes the current cluster from the config. Update the cluster again for subsequent runs.
-              aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.E2E_TEST_AWS_REGION }}
+              aws eks update-kubeconfig --name e2e-canary-test --region us-east-1
           
               echo "Destroying terraform"
               terraform destroy -auto-approve \
-                -var="test_id=${{ env.TESTING_ID }}" \
-                -var="aws_region=${{ env.E2E_TEST_AWS_REGION }}" \
-                -var="kube_directory_path=${{ github.workspace }}/.kube" \
-                -var="eks_cluster_name=${{ env.CLUSTER_NAME }}" \
-                -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
-                -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
-                -var="sample_app_image=${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}" \
-                -var="sample_remote_app_image=${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}"
+                -var="test_id=java-eks-10004236436-22-1" \
+                -var="aws_region=us-east-1" \
+                -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
+                -var="eks_cluster_name=e2e-canary-test" \
+                -var="test_namespace=ns-10004236436-22" \
+                -var="service_account_aws_access=service-account-java-eks-10004236436-22-1" \
+                -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
+                -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service"
           
               retry_counter=$(($retry_counter+1))
             else
