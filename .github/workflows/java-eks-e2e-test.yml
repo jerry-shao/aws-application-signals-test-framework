@@ -175,7 +175,6 @@ jobs:
           echo ${{ env.E2E_TEST_AWS_REGION }}
           echo ${{ github.workspace }}
           echo ${{ env.CLUSTER_NAME }}
-          echo ${{ env.SAMPLE_APP_NAMESPACE }}
           echo ${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}
           echo ${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}
           echo ${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}
@@ -195,7 +194,7 @@ jobs:
               -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
               -var="eks_cluster_name=e2e-canary-test" \
               -var="eks_cluster_context_name=$(kubectl config current-context)" \
-              -var="test_namespace=ns-10004236436-22" \
+              -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
               -var="service_account_aws_access=service-account-java-eks-10004236436-22-1" \
               -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
               -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service" \
@@ -216,16 +215,16 @@ jobs:
               "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/enable-app-signals.sh \
               e2e-canary-test \
               us-east-1 \
-              ns-10004236436-22" \
+              ${{ env.SAMPLE_APP_NAMESPACE }}" \
               "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
               e2e-canary-test \
               us-east-1 \
-              ns-10004236436-22 && \
+              ${{ env.SAMPLE_APP_NAMESPACE }} && \
               aws eks update-kubeconfig --name e2e-canary-test --region us-east-1" \
               60
           
-              execute_and_retry 2 "kubectl delete pods --all -n ns-10004236436-22" "" 60
-              execute_and_retry 2 "kubectl wait --for=condition=Ready --request-timeout '5m' pod --all -n ns-10004236436-22" "" 10
+              execute_and_retry 2 "kubectl delete pods --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 60
+              execute_and_retry 2 "kubectl wait --for=condition=Ready --request-timeout '5m' pod --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 10
           
               echo "Attempting to connect to the main sample app endpoint"
               main_sample_app_endpoint=http://$(terraform output sample_app_endpoint)
@@ -268,7 +267,7 @@ jobs:
               /__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
               e2e-canary-test \
               us-east-1 \
-              ns-10004236436-22
+              ${{ env.SAMPLE_APP_NAMESPACE }}
           
               # Running clean-app-signal.sh removes the current cluster from the config. Update the cluster again for subsequent runs.
               aws eks update-kubeconfig --name e2e-canary-test --region us-east-1
@@ -279,7 +278,7 @@ jobs:
                 -var="aws_region=us-east-1" \
                 -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
                 -var="eks_cluster_name=e2e-canary-test" \
-                -var="test_namespace=ns-10004236436-22" \
+                -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
                 -var="service_account_aws_access=service-account-java-eks-10004236436-22-1" \
                 -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
                 -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service"
