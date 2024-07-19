@@ -181,7 +181,6 @@ jobs:
           echo ${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}
           echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}
           echo ${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}
-          echo $GITHUB_WORKSPACE
           # Attempt to deploy the sample app on an EKS instance and wait for its endpoint to come online. 
           # There may be occasional failures due to transitivity issues, so try up to 2 times. 
           # deployment_failed of 0 indicates that both the terraform deployment and the endpoint are running, while 1 indicates
@@ -213,13 +212,13 @@ jobs:
             # If the deployment_failed is still 0, then the terraform deployment succeeded and now try to connect to the endpoint 
             # after installing App Signals. Attempts to connect will be made for up to 10 minutes
             if [ $deployment_failed -eq 0 ]; then
-              . ${{ env.TEST_RESOURCES_FOLDER }}/.github/workflows/util/execute_and_retry.sh
+              . /__w/aws-application-signals-test-framework/aws-application-signals-test-framework/.github/workflows/util/execute_and_retry.sh
               execute_and_retry 3 \
-              "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/enable-app-signals.sh \
+              "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/enable-app-signals.sh \
               e2e-canary-test \
               us-east-1 \
               ns-10004236436-22" \
-              "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
+              "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
               e2e-canary-test \
               us-east-1 \
               ns-10004236436-22 && \
@@ -267,7 +266,7 @@ jobs:
             # resources created from terraform and try again.
             if [ $deployment_failed -eq 1 ]; then
               echo "Cleaning up App Signal"
-              ${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
+              /__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
               e2e-canary-test \
               us-east-1 \
               ns-10004236436-22
