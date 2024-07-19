@@ -189,16 +189,16 @@ jobs:
             echo "Attempt $retry_counter"
             deployment_failed=0
             terraform apply -auto-approve \
-              -var="test_id=java-eks-10004236436-22-1" \
+              -var="test_id=${{ env.TESTING_ID }}" \
               -var="aws_region=us-east-1" \
               -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
               -var="eks_cluster_name=e2e-canary-test" \
               -var="eks_cluster_context_name=$(kubectl config current-context)" \
               -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
-              -var="service_account_aws_access=service-account-java-eks-10004236436-22-1" \
+              -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
               -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
               -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service" \
-              -var="rds_mysql_cluster_endpoint=example.com" \
+              -var="rds_mysql_cluster_endpoint=rdsaurorajavaclusterformysql.cluster-c3u7zyraw3mi.us-east-1.rds.amazonaws.com" \
               -var="rds_mysql_cluster_username=admin" \
               -var="rds_mysql_cluster_password=123456" \
             || deployment_failed=$?
@@ -274,12 +274,12 @@ jobs:
           
               echo "Destroying terraform"
               terraform destroy -auto-approve \
-                -var="test_id=java-eks-10004236436-22-1" \
+                -var="test_id=${{ env.TESTING_ID }}" \
                 -var="aws_region=us-east-1" \
                 -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
                 -var="eks_cluster_name=e2e-canary-test" \
                 -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
-                -var="service_account_aws_access=service-account-java-eks-10004236436-22-1" \
+                -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
                 -var="sample_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-main-service" \
                 -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service"
           
