@@ -171,12 +171,6 @@ jobs:
         id: deploy-sample-app
         working-directory: terraform/java/eks
         run: |
-          echo ${{ github.workspace }}
-          echo ${{ env.CLUSTER_NAME }}
-          echo ${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}
-          echo ${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}
-          echo ${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}
-          echo $(cat /__w/_temp/*.sh)
           # Attempt to deploy the sample app on an EKS instance and wait for its endpoint to come online. 
           # There may be occasional failures due to transitivity issues, so try up to 2 times. 
           # deployment_failed of 0 indicates that both the terraform deployment and the endpoint are running, while 1 indicates
@@ -189,18 +183,18 @@ jobs:
             terraform apply -auto-approve \
               -var="test_id=${{ env.TESTING_ID }}" \
               -var="aws_region=${{ env.E2E_TEST_AWS_REGION }}" \
-              -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
-              -var="eks_cluster_name=e2e-canary-test" \
+              -var="kube_directory_path=${{ github.workspace }}/.kube" \
+              -var="eks_cluster_name=${{ env.CLUSTER_NAME }}" \
               -var="eks_cluster_context_name=$(kubectl config current-context)" \
               -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
               -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
-              -var="sample_app_image=328959602803.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/appsignals-java-springboot-main-service" \
-              -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service" \
-              -var="rds_mysql_cluster_endpoint=rdsaurorajavaclusterformysql.cluster-c3u7zyraw3mi.us-east-1.rds.amazonaws.com" \
-              -var="rds_mysql_cluster_username=admin" \
-              -var='rds_mysql_cluster_password=QSLcl${]%wjN7]lq9Nb[)gMTbc.N' \
+              -var="sample_app_image=${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}" \
+              -var="sample_remote_app_image=${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}" \
+              -var="rds_mysql_cluster_endpoint=${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}" \
+              -var="rds_mysql_cluster_username=${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}" \
+              -var='rds_mysql_cluster_password=${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}' \
             || deployment_failed=$?
-          
+
             if [ $deployment_failed -ne 0 ]; then
               echo "Terraform deployment was unsuccessful. Will attempt to retry deployment."
             fi
@@ -208,17 +202,17 @@ jobs:
             # If the deployment_failed is still 0, then the terraform deployment succeeded and now try to connect to the endpoint 
             # after installing App Signals. Attempts to connect will be made for up to 10 minutes
             if [ $deployment_failed -eq 0 ]; then
-              . /__w/aws-application-signals-test-framework/aws-application-signals-test-framework/.github/workflows/util/execute_and_retry.sh
+              . ${{ env.TEST_RESOURCES_FOLDER }}/.github/workflows/util/execute_and_retry.sh
               execute_and_retry 3 \
-              "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/enable-app-signals.sh \
-              e2e-canary-test \
+              "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/enable-app-signals.sh \
+              ${{ env.CLUSTER_NAME }} \
               ${{ env.E2E_TEST_AWS_REGION }} \
               ${{ env.SAMPLE_APP_NAMESPACE }}" \
-              "/__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
-              e2e-canary-test \
+              "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
+              ${{ env.CLUSTER_NAME }} \
               ${{ env.E2E_TEST_AWS_REGION }} \
               ${{ env.SAMPLE_APP_NAMESPACE }} && \
-              aws eks update-kubeconfig --name e2e-canary-test --region us-east-1" \
+              aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.E2E_TEST_AWS_REGION }}" \
               60
           
               execute_and_retry 2 "kubectl delete pods --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 60
@@ -262,8 +256,8 @@ jobs:
             # resources created from terraform and try again.
             if [ $deployment_failed -eq 1 ]; then
               echo "Cleaning up App Signal"
-              /__w/aws-application-signals-test-framework/aws-application-signals-test-framework/enablement-script/clean-app-signals.sh \
-              e2e-canary-test \
+              ${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
+              ${{ env.CLUSTER_NAME }} \
               ${{ env.E2E_TEST_AWS_REGION }} \
               ${{ env.SAMPLE_APP_NAMESPACE }}
           
@@ -274,12 +268,12 @@ jobs:
               terraform destroy -auto-approve \
                 -var="test_id=${{ env.TESTING_ID }}" \
                 -var="aws_region=${{ env.E2E_TEST_AWS_REGION }}" \
-                -var="kube_directory_path=/home/runner/work/aws-application-signals-test-framework/aws-application-signals-test-framework/.kube" \
-                -var="eks_cluster_name=e2e-canary-test" \
+                -var="kube_directory_path=${{ github.workspace }}/.kube" \
+                -var="eks_cluster_name=${{ env.CLUSTER_NAME }}" \
                 -var="test_namespace=${{ env.SAMPLE_APP_NAMESPACE }}" \
                 -var="service_account_aws_access=service-account-${{ env.TESTING_ID }}" \
-                -var="sample_app_image=328959602803.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/appsignals-java-springboot-main-service" \
-                -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service"
+                -var="sample_app_image=${{ env.MAIN_SAMPLE_APP_IMAGE_ARN }}" \
+                -var="sample_remote_app_image=${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}"
           
               retry_counter=$(($retry_counter+1))
             else
