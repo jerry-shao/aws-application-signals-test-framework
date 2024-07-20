@@ -194,7 +194,7 @@ jobs:
               -var="rds_mysql_cluster_username=${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}" \
               -var='rds_mysql_cluster_password=${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}' \
             || deployment_failed=$?
-
+            
             if [ $deployment_failed -ne 0 ]; then
               echo "Terraform deployment was unsuccessful. Will attempt to retry deployment."
             fi
@@ -262,8 +262,8 @@ jobs:
               ${{ env.SAMPLE_APP_NAMESPACE }}
           
               # Running clean-app-signal.sh removes the current cluster from the config. Update the cluster again for subsequent runs.
-              aws eks update-kubeconfig --name e2e-canary-test --region us-east-1
-          
+              aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.E2E_TEST_AWS_REGION }}
+            
               echo "Destroying terraform"
               terraform destroy -auto-approve \
                 -var="test_id=${{ env.TESTING_ID }}" \
