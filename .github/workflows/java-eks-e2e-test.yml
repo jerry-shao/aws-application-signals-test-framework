@@ -198,7 +198,7 @@ jobs:
               -var="sample_remote_app_image=328959602803.dkr.ecr.us-east-1.amazonaws.com/appsignals-java-springboot-remote-service" \
               -var="rds_mysql_cluster_endpoint=rdsaurorajavaclusterformysql.cluster-c3u7zyraw3mi.us-east-1.rds.amazonaws.com" \
               -var="rds_mysql_cluster_username=admin" \
-              -var="rds_mysql_cluster_password='QSLcl${]%wjN7]lq9Nb[)gMTbc.N'" \
+              -var='rds_mysql_cluster_password="QSLcl${]%wjN7]lq9Nb[)gMTbc.N"' \
             || deployment_failed=$?
           
             if [ $deployment_failed -ne 0 ]; then
