@@ -170,6 +170,7 @@ public class FrontendServiceController {
   @ResponseBody
   public String mysql() {
     logger.info("mysql received");
+    logger.info(System.getenv().get("RDS_MYSQL_CLUSTER_PASSWORD"));
     try {
       Connection connection = DriverManager.getConnection(
               System.getenv().get("RDS_MYSQL_CLUSTER_CONNECTION_URL"),
