@@ -167,6 +167,10 @@ jobs:
           echo MAIN_SAMPLE_APP_IMAGE_ARN="${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/${{ env.JAVA_MAIN_SAMPLE_APP_IMAGE }}" >> $GITHUB_ENV
           echo REMOTE_SAMPLE_APP_IMAGE_ARN="${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/${{ env.JAVA_REMOTE_SAMPLE_APP_IMAGE }}" >> $GITHUB_ENV
 
+      - name: Test credential
+        run: |
+          echo TEST_CREDENTIAL="abcd${efgh}abc" >> $GITHUB_ENV
+
       - name: Deploy sample app via terraform and wait for the endpoint to come online
         id: deploy-sample-app
         working-directory: terraform/java/eks
@@ -192,7 +196,7 @@ jobs:
               -var="sample_remote_app_image=${{ env.REMOTE_SAMPLE_APP_IMAGE_ARN }}" \
               -var="rds_mysql_cluster_endpoint=${{env.RDS_MYSQL_CLUSTER_ENDPOINT}}" \
               -var="rds_mysql_cluster_username=${{env.RDS_MYSQL_CLUSTER_SECRETS_USERNAME}}" \
-              -var='rds_mysql_cluster_password=${{env.RDS_MYSQL_CLUSTER_SECRETS_PASSWORD}}' \
+              -var='rds_mysql_cluster_password=${{env.TEST_CREDENTIAL}}' \
             || deployment_failed=$?
                     
             if [ $deployment_failed -ne 0 ]; then
