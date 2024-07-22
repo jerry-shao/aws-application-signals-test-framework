@@ -169,7 +169,7 @@ jobs:
 
       - name: Test credential
         run: |
-          echo TEST_CREDENTIAL="abcd${efgh}abc" >> $GITHUB_ENV
+          echo 'TEST_CREDENTIAL=abcd${efgh}abc' >> $GITHUB_ENV
 
       - name: Deploy sample app via terraform and wait for the endpoint to come online
         id: deploy-sample-app
