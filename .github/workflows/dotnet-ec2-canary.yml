@@ -9,7 +9,7 @@ name: Dotnet EC2 Enablement Canary Testing
 on:
   workflow_dispatch: # be able to run the workflow on demand
   schedule:
-    - cron: '*/15 * * * *' # run the workflow every 15 minutes
+    #- cron: '*/15 * * * *' # run the workflow every 15 minutes
 
 permissions:
   id-token: write

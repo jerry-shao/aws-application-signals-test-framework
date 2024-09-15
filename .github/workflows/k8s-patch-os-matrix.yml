@@ -4,7 +4,7 @@ name: K8s Patch OS Matrix
 
 on:
   schedule:
-    - cron: '0 0 1 * *' # run the workflow beginning of every month
+    #- cron: '0 0 1 * *' # run the workflow beginning of every month
   workflow_dispatch: # be able to run the workflow on demand
 
 permissions:
