@@ -7,7 +7,7 @@
 ## including logs, metrics, and traces.
 name: Java EC2 Enablement Canary Testing
 on:
-  schedule:
+  #schedule:
     #- cron: '*/15 * * * *' # run the workflow every 15 minutes
   workflow_dispatch: # be able to run the workflow on demand
 

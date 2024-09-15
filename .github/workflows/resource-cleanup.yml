@@ -4,7 +4,7 @@
 name: AWS Resource Cleaner
 
 on:
-  schedule:
+  #schedule:
     #- cron: '0 18 * * *' # scheduled to run at 18:00 UTC every day
   workflow_dispatch: # be able to run on demand
 
